@@ -1,0 +1,137 @@
+CREATE KEYSPACE COVID
+    WITH REPLICATION = {
+        'class' : 'SimpleStrategy',
+        'replication_factor' : 1
+    }
+    AND DURABLE_WRITES = true;
+
+
+
+
+use covid;
+
+//  Table contenant les usagers et leurs proches
+
+CREATE TABLE Usagers (
+    codeUsager uuid,
+    api_key text static,
+    nom text static,
+    prenoms text static,
+    mdp text static, 
+    sexe text static,
+    age int static,
+    villeResidence text static,
+    telephone text static,
+    statut int static,
+    dateInscription timeuuid,
+    codeProcheUsager uuid,
+    nomProcheUsager text,
+    prenomsProcheUsager text,
+    telephoneProche text,
+    lien text,
+    primary key( (codeUsager, dateInscription), codeProcheUsager )
+)
+with clustering order by ( codeProcheUsager desc);
+
+
+
+
+
+
+
+CREATE TABLE ZonesARisque (
+    codeZone uuid,
+    centre text,
+    rayon float, 
+    statut int,
+    primary key( codeZone )
+);
+
+
+
+
+
+
+
+
+
+CREATE TABLE PositionsUsager (
+    codePosition uuid,
+    dateEnregistrement int,
+    codeUsagerPos int,
+    longitude text,
+    latitude text,
+    primary key((codePosition, codeUsagerPos), dateEnregistrement )
+)
+with clustering order by ( dateEnregistrement desc);
+
+
+
+
+
+
+CREATE TABLE Notification (
+    codeNotification uuid,
+    dateNotification int,
+    contenu text,
+    source text, 
+    primary key(( codeNotification, dateNotification ) )
+);
+
+
+
+
+
+
+
+
+//  Implémentation imossible parce que statut est une colonne statique
+
+//  CREATE MATERIALIZED VIEW UsagerSelonStatut 
+//  AS SELECT nom, prenoms, sexe, age, villeResidence, telephone, statut 
+//  FROM Usagers
+//  WHERE codeUsager IS NOT NULL AND statut IS NOT NULL
+//  PRIMARY KEY (codeUsager, statut);
+
+
+
+
+
+
+
+
+CREATE MATERIALIZED VIEW PositionSelonUsager 
+AS SELECT longitude, latitude
+FROM PositionsUsager
+WHERE codePosition IS NOT NULL AND codeUsagerPos IS NOT NULL AND dateEnregistrement IS NOT NULL 
+PRIMARY KEY (codeUsagerPos, codePosition, dateEnregistrement);
+
+
+
+
+
+
+
+
+CREATE MATERIALIZED VIEW UsagerSelonPosition 
+AS SELECT codeUsagerPos, codePosition, dateEnregistrement
+FROM PositionsUsager
+WHERE longitude IS NOT NULL AND latitude IS NOT NULL AND codePosition IS NOT NULL AND codeUsagerPos IS NOT NULL AND dateEnregistrement IS NOT NULL 
+PRIMARY KEY ((codeUsagerPos, codePosition), dateEnregistrement)
+with clustering order by ( dateEnregistrement desc);
+
+
+
+
+
+
+
+
+
+
+CREATE MATERIALIZED VIEW ProcheSelonUsager 
+AS SELECT nomProcheUsager, telephoneProche, lien
+FROM Usagers
+WHERE codeUsager IS NOT NULL AND codeProcheUsager IS NOT NULL AND dateInscription IS NOT NULL
+PRIMARY KEY ((codeUsager, dateInscription), codeProcheUsager);
+

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    
+    <form action="/register_user" method="post">
+
+        <input type="text" name="nom" id="nom" value="Bini">
+        <input type="text" name="prenoms" id="prenoms" value="Samuel">
+        <select name="sexe" id="sexe">
+            <option value="M" selected>M</option>
+            <option value="F">F</option>
+        </select>
+        <input type="number" name="age" id="age" value="20">
+        <input type="text" name="ville_residence" id="ville_residence" value="Abidjan">
+        <input type="tel" name="telephone" name="id" value="89990640">
+        <input type="password" name="mdp" id="mdp" value="samuel">
+        <input type="password" name="cmdp" id="cmdp" value="samuel">
+
+        <input type="submit" value="VALIDER">
+
+    </form>
+
+  </body>
+</html>
